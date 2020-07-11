@@ -5,10 +5,10 @@ safe_copy_existing_paths() {
 	if [ $# -ne 2 ]; then
 		echo "Must call with 2 file paths";
 		exit 1;
-	elif [ ! -f $1 ]; then
+	elif [ ! -e $1 ]; then
 		echo "$1 is not a file";
 		return 1;
-	elif [ ! -f $2 ]; then
+	elif [ ! -e $2 ]; then
 		echo "$2 is not a file";
 		return 1;
 	fi
@@ -36,3 +36,9 @@ testfn(){
 }
 
 testfn
+
+site_update(){
+	echo "updating site"
+	safe_copy_existing_paths $SITE_SRC $SITE_DST
+}
+site_update
