@@ -4,6 +4,8 @@ SCALE=320
 FRAMERATE=10
 TMPNAME=conversion_output
 
+shopt -s nocasematch
+
 if [ $# -ne 1 ]; then
     echo "Provide .mov file";
     exit 1;
