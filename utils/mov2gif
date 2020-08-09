@@ -1,0 +1,29 @@
+#!/bin/bash
+
+SCALE=320
+FRAMERATE=10
+TMPNAME=conversion_output
+
+if [ $# -ne 1 ]; then
+    echo "Provide .mov file";
+    exit 1;
+elif [ ! -f $1 ]; then
+    echo "$1 is not a file";
+    exit 1;
+elif [[ ${1:(-4)} != ".mov" ]]; then
+    echo "$1 is not a .mov";
+    exit 1;
+fi
+
+mkdir -p $TMPNAME
+
+fname=$1
+echo "filename: $fname"
+gifname="${fname: 0:-4}.gif"
+echo "output filename: $gifname"
+
+ffmpeg -i $fname -vf scale=$SCALE:-1 -r $FRAMERATE $TMPNAME/ffout%3d.png
+
+convert -delay 8 -loop 0 $TMPNAME/ffout*.png $gifname
+
+rm -rf $TMPNAME
