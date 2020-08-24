@@ -38,30 +38,79 @@ drive_space()
 
 home_space()
 {
-    echo "<h2>Home directory space by user</h2>"
-    echo "<pre>"
-    echo "Bytes Directory"
-    du -s /Users/* | sort -nr
-    echo "</pre>"
+    # only the superuser can get this information
+
+    if [ $(id -u) = "0" ]; then
+        echo "<h2>Home directory space by user</h2>"
+        echo "<pre>"
+        echo "Bytes Directory"
+        du -s /Users/* | sort -nr
+        echo "</pre>"
+    fi
+
+    # end of home_space
 }
+
+write_pate()
+{
+    cat <<- _EOF_
+    <html>
+        <head>
+            <title>
+            $title
+            </title>
+        </head>
+
+        <body>
+            <h1>$title $HOSTNAME</h1>
+            <p>$TIME_STAMP</p>
+            $(system_info)
+            $(show_uptime)
+            $(drive_space)
+            $(home_space)
+        </body>
+    </html>
+_EOF_
+
+}
+
+usage()
+{
+    echo "usage: sysinfo_page [[[-f file] [-i]] | [-h]]"
+}
+
 
 #### Main
 
-cat <<- _EOF_
-<html>
-    <head>
-        <title>
-        $title
-        </title>
-    </head>
+interactive=
+filename=~/system_info.html
 
-    <body>
-        <h1>$title $HOSTNAME</h1>
-        <p>$TIME_STAMP</p>
-        $(system_info)
-        $(show_uptime)
-        $(drive_space)
-        $(home_space)
-    </body>
-</html>
-_EOF_
+while [ "$1" != "" ]; do
+    case $1 in
+        -f | --file ) shift
+            filename=$1
+            ;;
+        -i | --interactive ) interactive=1
+            ;;
+        -h | --help )   usage
+            exit
+            ;;
+        * ) usage
+            exit 1
+    esac
+    shift
+done
+
+# Test code to verify command line processing
+
+if [ "$interactive" = "1" ]; then
+    echo "interactive is on"
+else
+    echo "interactive is off"
+fi
+echo "output file = $filename"
+
+# write page (comment out until testing is complete
+
+# write_page > $filename
+
