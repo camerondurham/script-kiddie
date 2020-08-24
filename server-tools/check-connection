@@ -1,0 +1,16 @@
+#!/bin/bash
+
+status="Failure"
+
+SITE="cmrn.xyz"
+
+for i in {1..5}
+do
+    echo "Attempt $i"
+    ping -c 1 ${SITE}
+    if [ "$?" == "0" ] ; then
+        status="Success"
+    fi
+done
+
+echo "Status of connection check = ${status}"

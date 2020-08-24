@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# example output
+# Today's date is: Sunday, August 23, 2020
+
+today(){
+
+    echo -n "Today's date is: "
+    date +"%A, %B %-d, %Y"
+}
