@@ -16,8 +16,24 @@ TIME_STAMP="Updated on $RIGHT_NOW by $USER"
 
 system_info()
 {
-    echo "<h2>System release info</h2>"
-    echo "<p>Function not yet implemented</p>"
+    # find any release files in /etc
+
+    if ls /etc/*release 1>/dev/null 2>&1; then
+        echo "<h2>System release info</h2>"
+        echo "<pre>"
+        for i in /etc/*release; do
+
+            # Since we can't be sure of the
+            # length of the file, only
+            # display the first line
+
+            head -n 1 $i
+        done
+        uname -orp
+        echo "</pre>"
+    fi
+
+    # end of system_info
 }
 
 show_uptime()
@@ -38,20 +54,26 @@ drive_space()
 
 home_space()
 {
-    # only the superuser can get this information
-
+    echo "<h2>Home directory space by user</h2>"
+    echo "<pre>"
+    format="%8s%10s%10s %-s\n"
+    printf "$format" "Dirs" "Files" "Blocks" "Directory"
+    printf "$format" "----" "-----" "------" "---------"
     if [ $(id -u) = "0" ]; then
-        echo "<h2>Home directory space by user</h2>"
-        echo "<pre>"
-        echo "Bytes Directory"
-        du -s /Users/* | sort -nr
-        echo "</pre>"
+        dir_list="/Users/*"
+    else
+        dir_list=$HOME
     fi
+    for home_dir in $dir_list; do
+        total_dirs=$(find $home_dir -type d | wc -l)
+        total_files=$(find $home_dir -type f | wc -l)
+        total_blocks=$(du -s $home_dir)
+        printf "$format" $total_dirs $total_files $total_blocks
+    done
+    echo "</pre>"
+} # end of home_space
 
-    # end of home_space
-}
-
-write_pate()
+write_page()
 {
     cat <<- _EOF_
     <html>
@@ -101,16 +123,28 @@ while [ "$1" != "" ]; do
     shift
 done
 
-# Test code to verify command line processing
 
 if [ "$interactive" = "1" ]; then
-    echo "interactive is on"
-else
-    echo "interactive is off"
+
+    response=
+
+    echo -n "Enter name of output file [$filename] > "
+    read response
+    if [ -n "$response" ]; then
+        filename=$response
+    fi
+
+    if [ -f $filename ]; then
+        echo -n "Output file exists. Overwrite? (y/n) > "
+        read response
+        if [ "$response" != "y" ]; then
+            echo "Exiting program."
+            exit 1
+        fi
+    fi
 fi
-echo "output file = $filename"
 
 # write page (comment out until testing is complete
 
-# write_page > $filename
+write_page > $filename
 

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+git_prompt() {
+  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
+  # 140 is light magenta
+  if [ ! -z $BRANCH ]; then
+      echo -n "%F{$GIT_BRANCH_COLOR}$BRANCH"
+
+      if git status --short 1>/dev/null 2>&1; then
+          num_changes=$(git status --short | wc -l | tr -d ' ')
+
+          if [ "$num_changes" -gt "0" ]; then
+              # 146 is light grey/blueish
+              echo " %F{$GIT_CHANGED_COLOR}● %F{$GIT_STAGED_COLOR}($num_changes)"
+          else
+              echo " %F{$GIT_CLEAN_COLOR}●"
+          fi
+      fi
+  fi
+}
+
+
+git_prompt
