@@ -1,0 +1,39 @@
+#!/bin/bash
+
+
+create_secrets_file() 
+{
+
+        local location=$1
+        cat > $location <<- EOF
+        export USERNAME=$USERNAME
+        export PASSWORD=$PASSWORD
+EOF
+}
+
+get_creds() 
+{
+
+        local USERNAME=
+        local PASSWORD=
+
+        echo "Please enter credentials:"
+        echo -n "Username: "
+        read USERNAME
+        echo -n "Password: "
+        read -s PASSWORD
+
+        echo
+        create_secrets_file "$FILENAME"
+        echo "Created secrets file: $FILENAME"
+}
+
+load_http_credentials() {
+        if [ ! -r $FILENAME ]; then
+                # ask user to provide credentials for login
+                get_creds
+        fi
+        source $FILENAME
+}
+
+load_http_credentials
