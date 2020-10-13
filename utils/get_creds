@@ -1,9 +1,7 @@
 #!/bin/bash
 
 
-create_secrets_file() 
-{
-
+create_secrets_file() {
         local location=$1
         cat > $location <<- EOF
         export USERNAME=$USERNAME
@@ -11,16 +9,17 @@ create_secrets_file()
 EOF
 }
 
-get_creds() 
-{
-
+get_creds() {
+        # sets local variables to empty strings
         local USERNAME=
         local PASSWORD=
 
         echo "Please enter credentials:"
         echo -n "Username: "
         read USERNAME
+        
         echo -n "Password: "
+        # -s (secret) suppress keypresses
         read -s PASSWORD
 
         echo
@@ -28,12 +27,11 @@ get_creds()
         echo "Created secrets file: $FILENAME"
 }
 
-load_http_credentials() {
+load_credentials() {
         if [ ! -r $FILENAME ]; then
-                # ask user to provide credentials for login
                 get_creds
         fi
         source $FILENAME
 }
 
-load_http_credentials
+load_credentials
