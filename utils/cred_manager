@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# key should never timeout
+key_timeout=0
+
+retrieve_if_cached() {
+  local retrieve_id=$1
+  if key_id=$(keyctl request user "$retrieve_id" 2>/dev/null); then
+    # Use "pipe" as "print" could print in hex if password is binary!
+    if keyctl pipe "$key_id" 2>/dev/null; then
+      echo "" # add a newline to the end of the retrieved password
+      # refresh the timeout for retrieved keys
+      keyctl timeout "$key_id" $key_timeout 2>/dev/null
+      exit 0
+    fi
+  fi
+}
+
+save_key() {
+  local keyname=$1
+  local prompt=$2
+
+  if [ -x /bin/systemd-ask-password ]; then
+    /bin/systemd-ask-password --timeout=0 --keyname=${keyname} --accept-cached ${prompt}
+  else
+    echo "ERROR: systemd-ask-password not available"
+    exit 1
+  fi
+}
+
+purge_key() {
+  local keyname=$1
+  if [ -n "$keyname" ]; then
+    keyctl purge user "$keyname" >/dev/null 2>&1
+  else
+    echo "No keyname to purge..."
+    exit 1
+  fi
+}
+
+
+load_http_credentials () {
+  USERNAME=$(retrieve_if_cached "USERNAME")
+  if [ -z "$USERNAME" ]; then
+    USERNAME=$(save_key "USERNAME" "Username: ")
+  fi
+
+  PASSWORD=$(retrieve_if_cached "PASSWORD")
+  if [ -z "$PASSWORD" ]; then
+    PASSWORD=$(save_key "PASSWORD" "Password: ")
+  fi
+}
