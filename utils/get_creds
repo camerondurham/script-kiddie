@@ -1,5 +1,9 @@
 #!/bin/bash
+#
+# get_creds
+#
 
+# Definitely one of the stupidest, most unsafe way to handle credentials
 
 create_secrets_file() {
         local location=$1
