@@ -1,0 +1,34 @@
+#!/bin/bash
+
+usage() {
+	echo "temp: print CPU temperature on Raspberry Pi"
+	echo "Usage: ./temp"
+	echo "       ./temp [c|f|C|F]"
+}
+
+if [[ $# -ne 1 ]] && [[ $# -ne 0 ]]; then
+	usage
+fi
+
+# as of Bash 4.0 convert arg to lowercase if it exists
+type="${1,,}"
+
+C=$(vcgencmd measure_temp | grep -E -o '[0-9]*\.[0-9]*')
+before=${C%.*}
+after=${C#*.}
+times_ten=$((before * 10 + after))
+F=$(((times_ten * 9) / 50 + 32))
+
+if [[ -z "$type" ]]; then
+	echo "C: $C"
+	echo "F: $F"
+else
+	case "$type" in 
+		c ) echo "$C"
+			;;
+		f ) echo "$F"
+			;;
+		* ) usage
+	esac
+fi
+
