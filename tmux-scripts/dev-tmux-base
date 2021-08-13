@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# session name
+sn="dev-tmux"
+
+tmux has-session -t "$sn" 2>/dev/null
+
+if [[ $? -ne 0 ]]; then
+
+    if [ -e "$HOME/.internal_envs" ]; then
+        source "$HOME/.internal_envs"
+    fi
+
+    # create session
+    cd ~/config
+    tmux new-session -s "$sn" -n "config" -d
+
+    cd ~/workplace/project1
+    # set title to last dir name in PWD path
+    tmux new-window -t "$sn" -n "${PWD##*/}"
+
+    cd ~/workplace/project2
+    tmux new-window -t "$sn" -n "${PWD##*/}"
+
+    cd ~/workplace/project2
+    tmux new-window -t "$sn" -n "ws:cis"
+
+    cd ~/workplace/project3
+    window="ws-project3-0"
+    full_window="${sn}:${window}"
+    tmux new-window -t "$sn" -n "${window}"
+
+    # run tool in window
+    tmux send-keys -t "${full_window}" "${tool1}" 'C-m'
+    tmux split-window -t ${full_window} -h
+
+    workspace_path="${HOME}/workplace"
+    tmux send-keys -t "${full_window}.1" "cd ~/workplace/project4" Enter
+
+    tmux new-window -t "$sn" -n "ws-project4-1"
+
+    # from https://superuser.com/a/492549
+        # session=whatever
+        # window=${session}:0
+        # pane=${window}.4
+        # tmux send-keys -t "$pane" C-z 'some -new command' Enter
+    # tmux new-window -t "$sn" -n "ws:project4:sync"
+
+
+    cd ~/workplace
+    tmux new-window -t "$sn" -n "workplace"
+
+fi
+
+# attach to running session
+tmux -2 attach-session -t "$sn"
