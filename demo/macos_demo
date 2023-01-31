@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DEFAULT_PATH=$HOME/demos
+
+demo() {
+  if [[ $# < 1 ]]; then
+    echo "no name provided for screencapture"
+    echo "usage: demo <one-string-summary> <optional-destination-path>"
+    return
+  fi
+  summary=$1
+  destpath=${2:-"$DEFAULT_PATH"}
+  local datefmt
+  # example:
+  # 2023-01-23-18-01
+  datefmt=$(date +"%Y-%m-%d-%H-%m")
+  screencapture -v "$destpath/$datefmt-$summary.mov"
+}
+
+demo "$@"
